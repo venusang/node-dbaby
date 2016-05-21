@@ -1,0 +1,182 @@
+<%
+	var showIris	= locals.showIris || false,
+		page		= locals.page || null,
+		h1Start 	= h1End = "";
+	if ( page && page.title && page.title === "Disney Baby" ) {
+		h1Start = '<h1>', h1End = '</h1>';
+	}
+%><!DOCTYPE html>
+<html>
+<head>
+<%- partial("partials/meta") %>
+<%
+	//include passed in meta next/prev tags
+	if ( locals.linkrelheaders ) { 
+%>
+<%- locals.linkrelheaders %>
+<%
+	}
+%>
+	<link rel="shortcut icon" href="/favicon-rb12.ico">
+	<link rel="apple-touch-icon-precomposed" href="/apple-touch-icon-57x57-precomposed-rb12.png"> <!-- Default -->
+	<link rel="apple-touch-icon-precomposed" sizes="72x72" href="/apple-touch-icon-72x72-precomposed-rb12.png"> <!-- iPad -->
+	<link rel="apple-touch-icon-precomposed" sizes="114x114" href="/apple-touch-icon-114x114-precomposed-rb12.png"> <!-- iPhone w/ retina display -->
+<%		
+	if ( settings[ 'explode css' ] ) {
+%>
+	<link rel="stylesheet" href="/styles/reset.css">
+	<link rel="stylesheet" href="/styles/bryant-pro.css">
+	<link rel="stylesheet" href="/styles/default.css">
+	<link rel="stylesheet" href="/styles/iris.css">
+	<link rel="stylesheet" href="/styles/ticker.css">
+	<link rel="stylesheet" href="/styles/did.css">
+<%
+	} else {
+%>
+	<link rel="stylesheet" href="<%= fixedcdn( "/styles/compressed.css?v=" + settings['build-timestamp']  ) %>">
+<%		
+	}
+%>
+	<!--[if lt IE 10]><link rel="stylesheet" href="<%= fixedcdn( "/styles/ie.css" ) %>"><![endif]-->
+	<!--[if lt IE 9]><link rel="stylesheet" href="<%= fixedcdn( "/styles/ie8.css" ) %>"><![endif]-->
+	<!--[if lt IE 8 ]><link rel="stylesheet" href="<%= fixedcdn( "/styles/ie7.css" ) %>"><![endif]-->
+<%- partial("partials/foresee") %>
+<%		
+	if ( settings[ 'explode js' ] ) {
+%>
+	<script src="/scripts/libs/modernizr.js"></script>
+	<script src="/scripts/libs/jquery-1.7.1.min.js"></script>
+	<script src="/scripts/libs/jquery.easing.js"></script>
+	<script src="/scripts/libs/jquery.form.js"></script>
+	<script src="/scripts/libs/jquery.lazyload.min.js"></script>
+	<script src="/scripts/libs/cloud-zoom.1.0.2.min.js"></script>
+	<script src="/scripts/default.js"></script>
+	<script src="/scripts/moment.js"></script>
+	<script src="/scripts/email.js"></script>
+	<script src="/scripts/iris.js"></script>
+	<script type="text/javascript" id="disneyid-script" src="https://stg.registerdisney.go.com/js/DisneyID.js"></script>
+	<script src="/scripts/did.js"></script>
+	<!--[if lt IE 8]>
+	<script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE8.js"></script>
+	<![endif]-->
+	
+<%
+	} else {
+%>
+	<script src="<%= fixedcdn( "/scripts/compiled.js?v=" + settings['build-timestamp'] ) %>"></script>
+<%
+	}
+%>
+<%
+	if ( urls ) {
+		
+		var protocol = 'http';
+		if ( urls.callback ) {
+			if ( urls.callback.protocol ) {
+				protocol = urls.callback.protocol;
+			}
+		}
+%>
+	<script>
+<%
+		if ( urls.signup ) {
+%>
+		var SIGNUP_URL = '<%= urls.signup %>?redirectUrl=<%= encodeURIComponent( protocol + "://" + host + "/sign-up/?redirect=" + encodeURIComponent( "http://" + host + ( page && page.url ? ( page.url === "/home-page" ? "" : page.url ) : ( page && page.type === "moment" ? ( locals.mine ? "/my-moments/" : "/magical-moments/" ) + page.swidHash + "/" + page.id : "" ) ) + "/#add" ) ) %>';
+<%
+		}
+		if ( urls.login ) {
+%>
+		var LOGIN_URL = '<%= urls.login %>?redirectUrl=<%= encodeURIComponent( protocol + "://" + host + "/log-in/?redirect=" + encodeURIComponent( "http://" + host + ( page && page.url ? ( page.url === "/home-page" ? "" : page.url ) : ( page && page.type === "moment" ? ( locals.mine ? "/my-moments/" : "/magical-moments/" ) + page.swidHash + "/" + page.id : "" ) ) + "/#add" ) ) %>';
+<%
+		}
+%>
+		var cdn = function( url ) {
+			if ( cdn.options.length <= 0 || ( url.toLowerCase() ).indexOf('http') === 0 ) return url;
+			cdn.current++;
+			if ( cdn.current >= cdn.options.length ) cdn.current = 0;
+			return cdn.options[ cdn.current ] + url;
+		};
+		cdn.current = 0;
+		cdn.options = [<%= _.reduce( urls.cdn, function( memo, value, key ) { return memo + ( key > 0 ? ',' : '' ) + "'" + value + "'"; }, '' ) %>];
+	</script>
+<%
+	}
+%>
+
+<%- partial("partials/omniture") %>
+</head>
+
+<body class="iris-<% if ( showIris ) { %>on<% } else { %>off<% } %>" data-iris="<% if ( showIris ) { %>on<% } else { %>off<% } %>">
+	<div id="wrapper">
+		<header id="header">
+		<!--[if lt IE 9 ]><div id="header"><![endif]-->
+			<div id="header-content">
+			<%- h1Start %><a class="logo" href="/">Disney Baby</a><%- h1End %>
+			
+			<%- partial("partials/did") %>
+			<a class="magical-moments<%= ( page && ( page.name === 'magical-moments' || page.type === 'moment' ) ) ? ' selected' : '' %>" href="/magical-moments/">Magical Moments</a>
+			
+			
+			<%- partial("partials/search") %>
+			
+			
+			<%- partial("partials/sponsor") %>
+			</div>
+		<!--[if lt IE 9 ]></div><![endif]-->
+		</header>
+
+<%- partial("partials/navigation") %>
+
+<div class="page-start<% if ( page && showIris ) { %> page-start-iris<% } %>"></div>
+<%
+	if ( page && showIris ) {
+%>
+<%- partial("partials/iris") %>
+<%
+	}
+%>
+<%- partial("partials/social-bar", {page: locals.page}) %>
+<%- partial( "partials/ticker" ) %>
+		<div id="content"<%- ( page && page.name && page.type !== 'moment' ) ? ' class="' + page.name + '"' : '' %>>
+<%- body %>
+		</div>
+<%- partial("partials/footer") %>
+	</div>
+<%
+	//execute passed in js strings
+	if ( locals.scripts ) { 
+%>
+<%- locals.scripts %>
+<%
+	}
+%>
+	<!-- Social Libraries -->
+	<div id="fb-root"></div>
+	<script>(function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(d.getElementById(id))return;js=d.createElement(s);js.id=id;js.src="//connect.facebook.net/en_US/all.js#xfbml=1&appId=235403976528727";fjs.parentNode.insertBefore(js,fjs);}(document,'script','facebook-jssdk'));</script>
+	<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+	<script>(function(){var po=document.createElement('script');po.type='text/javascript';po.async=true;po.src='https://apis.google.com/js/plusone.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(po,s);})();</script>
+	<script>(function(){var pt=document.createElement('script');pt.type='text/javascript';pt.async=true;pt.src='//assets.pinterest.com/js/pinit.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(pt,s);})();</script>
+	<script type="text/javascript"> 
+	  var _gaq = _gaq || []; 
+	  _gaq.push(['_setAccount', 'UA-27512412-1']); 
+	  _gaq.push(['_setDomainName', 'www.disneybaby.com']); 
+	  _gaq.push(['_trackPageview']); 
+	  (function() {
+	    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; 
+	    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; 
+	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); 
+	  })(); 
+	</script> 
+	<script type="text/javascript" src="/foresee/foresee-trigger.js"></script> 
+	<%
+	// Rocket Fuel Conversion Action Tracking Code Version 7
+	// this supports the Disney Consumer Products media buy initiative for Disney Baby
+	%>
+	<img src='http://p.rfihub.com/ca.gif?rb=918&ca=20481111&ra=%n' height=0 width=0 style='display:none' alt='Rocket Fuel'/>
+
+
+	<!-- search auto complete -->
+	<script src="/scripts/sac.js"></script>
+
+</body>
+</html>
